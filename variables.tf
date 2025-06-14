@@ -7,10 +7,6 @@ variable "project_name" {
   description = "Nome base do projeto"
 }
 
-variable "image" {
-  description = "Imagem Docker a ser usada no ECS"
-}
-
 variable "cpu" {
   description = "Quantidade de CPU para a task"
   default     = "256"
@@ -29,4 +25,10 @@ variable "desired_count" {
 variable "container_port" {
   description = "Porta exposta pelo container"
   default     = 80
+}
+
+variable "image" {
+  description = "Imagem Docker completa com tag (ex: 123456789012.dkr.ecr.sa-east-1.amazonaws.com/projeto:tag)"
+  type        = string
+  default     = ""
 }

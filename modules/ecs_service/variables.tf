@@ -1,14 +1,34 @@
-variable "project_name" {}
-variable "image" {}
+variable "project_name" {
+  description = "Nome do projeto / serviço"
+  type        = string
+}
+
 variable "cpu" {
-  default = "256"
+  description = "CPU units para a task ECS"
+  type        = number
+  default     = 256
 }
+
 variable "memory" {
-  default = "512"
+  description = "Memória (MB) para a task ECS"
+  type        = number
+  default     = 512
 }
-variable "desired_count" {
-  default = 1
-}
+
 variable "container_port" {
-  default = 80
+  description = "Porta exposta no container"
+  type        = number
+  default     = 8080
+}
+
+variable "desired_count" {
+  description = "Número de instâncias desejadas do serviço ECS"
+  type        = number
+  default     = 1
+}
+
+variable "image" {
+  description = "URI da imagem Docker com tag para ECS"
+  type        = string
+  default = ""
 }
