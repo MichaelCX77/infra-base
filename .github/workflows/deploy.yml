@@ -22,7 +22,7 @@ jobs:
       - name: Checkout código Terraform
         uses: actions/checkout@v3
         with:
-          path: infra-base
+          path: infra
 
       - name: Instalar Terraform
         uses: hashicorp/setup-terraform@v3
@@ -37,11 +37,11 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Terraform Init
-        working-directory: infra-base
+        working-directory: infra
         run: terraform init
 
       - name: Terraform Apply Infra
-        working-directory: infra-base
+        working-directory: infra
         run: terraform apply -auto-approve -var="project_name=${{ inputs.project_name }}"
 
   # 🚀 2. Build e Push da imagem
@@ -98,7 +98,7 @@ jobs:
       - name: Checkout código Terraform
         uses: actions/checkout@v3
         with:
-          path: infra-base
+          path: infra
 
       - name: Instalar Terraform
         uses: hashicorp/setup-terraform@v3
@@ -113,9 +113,9 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Terraform Init
-        working-directory: infra-base
+        working-directory: infra
         run: terraform init
 
       - name: Atualizar ECS com nova imagem
-        working-directory: infra-base
+        working-directory: infra
         run: terraform apply -auto-approve -var="project_name=${{ inputs.project_name }}" -var="image=${{ needs.package.outputs.image_uri }}"
