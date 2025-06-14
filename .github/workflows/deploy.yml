@@ -21,7 +21,7 @@ on:
         required: true
 
 jobs:
-  # 1. Criar Infra com módulo ecs_service
+  # 1. Criar Infra
   infra:
     runs-on: ubuntu-latest
     outputs:
@@ -51,8 +51,8 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Terraform Init e Apply - ecs_service
-        working-directory: infra/ecs_service
+      - name: Terraform Init e Apply - ecs_infra
+        working-directory: infra/ecs_infra
         run: |
           terraform init
           terraform apply -auto-approve -var="project_name=${{ steps.extract_name.outputs.project_name_clean }}"
@@ -130,8 +130,8 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Terraform Init e Apply - ecs_task com nova imagem
-        working-directory: infra/ecs_task
+      - name: Terraform Init e Apply - ecs_app com nova imagem
+        working-directory: infra/ecs_app
         run: |
           terraform init
           terraform apply -auto-approve \
