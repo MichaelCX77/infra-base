@@ -18,8 +18,6 @@ jobs:
   # 🚀 1. Criar Infra
   infra:
     runs-on: ubuntu-latest
-    env:
-      AWS_REGION: ${{ secrets.AWS_REGION }}
     steps:
       - name: Checkout código Terraform
         uses: actions/checkout@v3
@@ -36,7 +34,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Terraform Init
         working-directory: infra-base
@@ -53,8 +51,6 @@ jobs:
     outputs:
       image_uri: ${{ steps.set-image.outputs.image_uri }}
       ecr_uri: ${{ steps.set-image.outputs.ecr_uri }}
-    env:
-      AWS_REGION: ${{ secrets.AWS_REGION }}
 
     steps:
       - name: Checkout código
@@ -65,14 +61,14 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - id: set-image
         name: Definir URIs da imagem
         run: |
           IMAGE_TAG=$(date +%Y%m%d%H%M%S)
           REPO_NAME="${{ inputs.project_name }}"
-          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text --region $AWS_REGION)
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text --region ${{ secrets.AWS_REGION }})
           ECR_URI="$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$REPO_NAME"
           IMAGE_URI="$ECR_URI:$IMAGE_TAG"
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
@@ -97,8 +93,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: package
-    env:
-      AWS_REGION: ${{ secrets.AWS_REGION }}
 
     steps:
       - name: Checkout código Terraform
@@ -116,7 +110,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Terraform Init
         working-directory: infra-base
