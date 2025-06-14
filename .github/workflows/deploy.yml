@@ -1,12 +1,23 @@
-name: Deploy Completo
+name: Deploy AWS
 
 on:
-  push:
-    branches:
-      - main
+  workflow_call:
+    inputs:
+      project_name:
+        required: true
+        type: string
+      aws_region:
+        required: false
+        type: string
+        default: "sa-east-1"
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
 
 env:
-  AWS_REGION: sa-east-1
+  AWS_REGION: ${{ inputs.aws_region }}
 
 jobs:
   deploy:
@@ -23,7 +34,7 @@ jobs:
         name: Gerar tag da imagem
         run: |
           IMAGE_TAG=$(date +%Y%m%d%H%M%S)
-          REPO_NAME="meu-projeto"
+          REPO_NAME="${{ inputs.project_name }}"
           ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text --region $AWS_REGION)
           ECR_URI="$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$REPO_NAME"
           IMAGE_URI="$ECR_URI:$IMAGE_TAG"
@@ -40,17 +51,17 @@ jobs:
 
       - name: Criar repositório ECR (se não existir)
         run: |
-          aws ecr describe-repositories --repository-names "$REPO_NAME" || aws ecr create-repository --repository-name "$REPO_NAME"
+          aws ecr describe-repositories --repository-names "${{ inputs.project_name }}" || aws ecr create-repository --repository-name "${{ inputs.project_name }}"
 
       - name: Login no ECR
         run: |
           aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${{ steps.set-image.outputs.ecr_uri }}
 
       - name: Build da imagem Docker
-        run: docker build -t "$REPO_NAME:${{ steps.set-image.outputs.IMAGE_TAG }}" .
+        run: docker build -t "${{ inputs.project_name }}:${{ steps.set-image.outputs.IMAGE_TAG }}" .
 
       - name: Tag da imagem para o ECR (tag randômica)
-        run: docker tag "$REPO_NAME:${{ steps.set-image.outputs.IMAGE_TAG }}" "${{ steps.set-image.outputs.ecr_uri }}:${{ steps.set-image.outputs.IMAGE_TAG }}"
+        run: docker tag "${{ inputs.project_name }}:${{ steps.set-image.outputs.IMAGE_TAG }}" "${{ steps.set-image.outputs.ecr_uri }}:${{ steps.set-image.outputs.IMAGE_TAG }}"
 
       - name: Push para o ECR (tag randômica)
         run: docker push "${{ steps.set-image.outputs.ecr_uri }}:${{ steps.set-image.outputs.IMAGE_TAG }}"
@@ -80,8 +91,8 @@ jobs:
 
       - name: Terraform Plan
         working-directory: infra-base
-        run: terraform plan -var="project_name=meu-projeto" -var="image=${{ steps.set-image.outputs.ecr_uri }}:latest"
+        run: terraform plan -var="project_name=${{ inputs.project_name }}" -var="image=${{ steps.set-image.outputs.ecr_uri }}:latest"
 
       - name: Terraform Apply
         working-directory: infra-base
-        run: terraform apply -auto-approve -var="project_name=meu-projeto" -var="image=${{ steps.set-image.outputs.ecr_uri }}:latest"
+        run: terraform apply -auto-approve -var="project_name=${{ inputs.project_name }}" -var="image=${{ steps.set-image.outputs.ecr_uri }}:latest"
