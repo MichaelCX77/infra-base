@@ -21,8 +21,6 @@ jobs:
     steps:
       - name: Checkout código Terraform
         uses: actions/checkout@v3
-        with:
-          path: infra
 
       - name: Instalar Terraform
         uses: hashicorp/setup-terraform@v3
