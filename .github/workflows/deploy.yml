@@ -15,7 +15,7 @@ on:
         required: true
 
 env:
-  AWS_REGION: ${{ inputs.aws_region }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
 
 jobs:
   deploy:
