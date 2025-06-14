@@ -24,6 +24,8 @@ jobs:
   # 🚀 1. Criar Infra
   infra:
     runs-on: ubuntu-latest
+    outputs:
+      project_name_clean: ${{ steps.extract_name.outputs.project_name_clean }}
     steps:
       - name: Checkout código Terraform
         uses: actions/checkout@v3
@@ -31,6 +33,11 @@ jobs:
           repository: ${{ inputs.repo }}
           ref: ${{ inputs.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extrair só o nome do repo (parte após /)
+        id: extract_name
+        run: |
+          echo "::set-output name=project_name_clean::$(echo '${{ inputs.project_name }}' | cut -d'/' -f2)"
 
       - name: Instalar Terraform
         uses: hashicorp/setup-terraform@v3
@@ -50,7 +57,7 @@ jobs:
 
       - name: Terraform Apply Infra
         working-directory: infra
-        run: terraform apply -auto-approve -var="project_name=${{ inputs.project_name }}"
+        run: terraform apply -auto-approve -var="project_name=${{ steps.extract_name.outputs.project_name_clean }}"
 
   # 🚀 2. Build e Push da imagem
   package:
@@ -79,7 +86,7 @@ jobs:
         name: Definir URIs da imagem
         run: |
           IMAGE_TAG=$(date +%Y%m%d%H%M%S)
-          REPO_NAME="${{ inputs.project_name }}"
+          REPO_NAME="${{ needs.infra.outputs.project_name_clean }}"
           ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text --region ${{ secrets.AWS_REGION }})
           ECR_URI="$ACCOUNT_ID.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$REPO_NAME"
           IMAGE_URI="$ECR_URI:$IMAGE_TAG"
@@ -92,11 +99,11 @@ jobs:
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ steps.set-image.outputs.ecr_uri }}
 
       - name: Build Docker
-        run: docker build -t "${{ inputs.project_name }}:$IMAGE_TAG" .
+        run: docker build -t "${{ needs.infra.outputs.project_name_clean }}:$IMAGE_TAG" .
 
       - name: Tag e Push da Imagem
         run: |
-          docker tag "${{ inputs.project_name }}:$IMAGE_TAG" "${{ steps.set-image.outputs.ecr_uri }}:$IMAGE_TAG"
+          docker tag "${{ needs.infra.outputs.project_name_clean }}:$IMAGE_TAG" "${{ steps.set-image.outputs.ecr_uri }}:$IMAGE_TAG"
           docker push "${{ steps.set-image.outputs.ecr_uri }}:$IMAGE_TAG"
           docker tag "${{ steps.set-image.outputs.ecr_uri }}:$IMAGE_TAG" "${{ steps.set-image.outputs.ecr_uri }}:latest"
           docker push "${{ steps.set-image.outputs.ecr_uri }}:latest"
@@ -133,4 +140,4 @@ jobs:
 
       - name: Atualizar ECS com nova imagem
         working-directory: infra
-        run: terraform apply -auto-approve -var="project_name=${{ inputs.project_name }}" -var="image=${{ needs.package.outputs.image_uri }}"
+        run: terraform apply -auto-approve -var="project_name=${{ needs.infra.outputs.project_name_clean }}" -var="image=${{ needs.package.outputs.image_uri }}"
