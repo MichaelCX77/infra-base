@@ -32,3 +32,8 @@ variable "subnet_ids" {
   description = "Lista de subnets públicas para Load Balancer e ECS"
   type        = list(string)
 }
+
+variable "capacity_provider" {
+  description = "Tipo de instancias ['FARGATE','FARGATE_SPOT']"
+  type        = string
+}
