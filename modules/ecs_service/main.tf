@@ -5,33 +5,13 @@ resource "random_string" "suffix" {
   special = false
 }
 
-# VPC existente pelo nome da tag
-data "aws_vpcs" "myvpc" {
-  filter {
-    name   = "tag:Name"
-    values = [var.vpc_name]
-  }
-}
-
+# Referência direta à VPC existente pelo ID
 data "aws_vpc" "myvpc" {
-  id = data.aws_vpcs.myvpc.ids[0]
+  id = var.vpc_id
 }
 
 # Zonas de disponibilidade
 data "aws_availability_zones" "available" {}
-
-# Subnets públicas com tag "Public = true"
-data "aws_subnets" "public" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.myvpc.id]
-  }
-
-  filter {
-    name   = "tag:Public"
-    values = ["true"]
-  }
-}
 
 # Security group para o ALB
 resource "aws_security_group" "alb_sg" {
@@ -62,7 +42,7 @@ resource "aws_lb" "this" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
-  subnets            = data.aws_subnets.public.ids
+  subnets            = var.subnet_ids
 
   lifecycle {
     create_before_destroy = true
@@ -136,11 +116,11 @@ resource "aws_ecs_service" "this" {
   name            = "${var.project_name}-service"
   cluster         = aws_ecs_cluster.this.id
   task_definition = aws_ecs_task_definition.this.arn
-  launch_type     = "FARGATE"
+  launch_type     = "FARGATE_SPOT"
   desired_count   = var.desired_count
 
   network_configuration {
-    subnets         = data.aws_subnets.public.ids
+    subnets         = var.subnet_ids
     security_groups = [aws_security_group.alb_sg.id]
     assign_public_ip = true
   }
