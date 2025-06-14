@@ -2,12 +2,14 @@ resource "aws_vpc" "this" {
   cidr_block = "10.0.0.0/16"
 }
 
+data "aws_availability_zones" "available" {}
+
 resource "aws_subnet" "public" {
-  count = 2
-  cidr_block = cidrsubnet(aws_vpc.this.cidr_block, 8, count.index)
-  vpc_id     = aws_vpc.this.id
+  count                   = 2
+  cidr_block              = cidrsubnet(aws_vpc.this.cidr_block, 8, count.index)
+  vpc_id                  = aws_vpc.this.id
   map_public_ip_on_launch = true
-  availability_zone = data.aws_availability_zones.available.names[count.index]
+  availability_zone       = data.aws_availability_zones.available.names[count.index]
 }
 
 resource "aws_security_group" "alb_sg" {
@@ -36,6 +38,29 @@ resource "aws_lb" "this" {
   subnets            = aws_subnet.public[*].id
 }
 
+resource "aws_lb_target_group" "this" {
+  name        = "${var.project_name}-tg"
+  port        = var.container_port
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.this.id
+  target_type = "ip"
+}
+
+resource "aws_lb_listener" "http" {
+  load_balancer_arn = aws_lb.this.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.this.arn
+  }
+}
+
+resource "aws_ecr_repository" "repo" {
+  name = var.project_name
+}
+
 resource "aws_ecs_cluster" "this" {
   name = "${var.project_name}-cluster"
 }
@@ -49,13 +74,14 @@ resource "aws_ecs_task_definition" "this" {
 
   container_definitions = jsonencode([{
     name  = var.project_name
-    image = var.image
+    image = "${var.image}"
     portMappings = [{
       containerPort = var.container_port
       protocol      = "tcp"
     }]
   }])
 }
+
 
 resource "aws_ecs_service" "this" {
   name            = "${var.project_name}-service"
@@ -78,24 +104,3 @@ resource "aws_ecs_service" "this" {
 
   depends_on = [aws_lb_listener.http]
 }
-
-resource "aws_lb_target_group" "this" {
-  name     = "${var.project_name}-tg"
-  port     = var.container_port
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.this.id
-  target_type = "ip"
-}
-
-resource "aws_lb_listener" "http" {
-  load_balancer_arn = aws_lb.this.arn
-  port              = 80
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.this.arn
-  }
-}
-
-data "aws_availability_zones" "available" {}
