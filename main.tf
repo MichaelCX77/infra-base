@@ -11,5 +11,6 @@ module "ecs_base" {
   desired_count  = var.desired_count
   container_port = var.container_port
   image          = "${module.ecs_base.ecr_repository_url}:latest"
-  vpc_name       = var.vpc_name
+  vpc_id         = var.vpc_id
+  subnet_ids     = var.subnet_ids
 }
