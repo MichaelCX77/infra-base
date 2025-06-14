@@ -6,14 +6,12 @@ on:
       project_name:
         required: true
         type: string
-      aws_region:
-        required: false
-        type: string
-        default: "sa-east-1"
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
       AWS_SECRET_ACCESS_KEY:
+        required: true
+      AWS_REGION:
         required: true
 
 env:
