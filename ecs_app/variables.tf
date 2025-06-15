@@ -63,3 +63,8 @@ variable "vpc_id" {
 variable "image" {
   type    = string
 }
+
+# Role ARN
+variable "execution_role_arn" {
+  type    = string
+}
