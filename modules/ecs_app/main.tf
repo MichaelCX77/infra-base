@@ -10,6 +10,7 @@ resource "aws_ecs_task_definition" "this" {
     name  = var.project_name
     image = "${var.image}"
     portMappings = [{
+      port = 8080
       containerPort = var.container_port
       protocol      = "tcp"
     }]
