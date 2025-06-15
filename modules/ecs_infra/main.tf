@@ -55,6 +55,18 @@ resource "aws_lb_target_group" "this" {
   vpc_id      = data.aws_vpc.myvpc.id
   target_type = "ip"
 
+  health_check {
+    enabled             = true
+    path                = var.health_check_path
+    port                = "traffic-port"    
+    protocol            = "HTTP"
+    matcher             = "200-399"         
+    interval            = var.health_check_interval                
+    timeout             = var.health_check_timeout                 
+    healthy_threshold   = var.health_check_healthy_threshold                 
+    unhealthy_threshold = var.unhealthy_threshold                 
+  }
+
   lifecycle {
     create_before_destroy = true
   }
