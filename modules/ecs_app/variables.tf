@@ -41,22 +41,24 @@ variable "subnet_ids" {
 # ID do grupo de segurança para o serviço ECS
 variable "security_group_id" {
   type = string
-  default = ""
 }
 
 # ID do cluster ECS onde o serviço será criado
 variable "cluster_id" {
   type = string
-  default = ""
 }
 
 # ARN do target group do Application Load Balancer para associar ao serviço ECS
 variable "target_group_arn" {
   type = string
-  default = ""
 }
 
 # URI da imagem docker que será usada na task ECS (sem tag, adicionamos ":latest" no main.tf)
 variable "image" {
+  type    = string
+}
+
+# Role ARN
+variable "execution_role_arn" {
   type    = string
 }
