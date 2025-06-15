@@ -1,7 +1,3 @@
-output "ecr_repository_url" {
-  value = aws_ecr_repository.repo.repository_url
-}
-
 output "cluster_id" {
   value = aws_ecs_cluster.this.id
 }

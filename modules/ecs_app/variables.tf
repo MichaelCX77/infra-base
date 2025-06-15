@@ -59,5 +59,4 @@ variable "target_group_arn" {
 # URI da imagem docker que será usada na task ECS (sem tag, adicionamos ":latest" no main.tf)
 variable "image" {
   type    = string
-  default = ""
 }

@@ -139,13 +139,6 @@ jobs:
           terraform init
           terraform apply -auto-approve \
             -var="project_name=${{ needs.infra.outputs.project_name_clean }}" \
-            -var="cpu=${{ vars.cpu }}" \
-            -var="memory=${{ vars.memory }}" \
-            -var="desired_count=${{ vars.desired_count }}" \
-            -var="capacity_provider=${{ vars.capacity_provider }}" \
-            -var="subnet_ids=${{ tojson(vars.subnet_ids) }}" \
-            -var="vpc_id=${{ vars.vpc_id }}" \
-            -var="container_port=${{ vars.container_port }}" \
+            -var="image=${{ needs.package.outputs.image_uri }}" \
             -var="security_group_id=${{ needs.infra.outputs.security_group_id }}" \
-            -var="cluster_id=${{ needs.infra.outputs.cluster_id }}" \
             -var="target_group_arn=${{ needs.infra.outputs.target_group_arn }}"
