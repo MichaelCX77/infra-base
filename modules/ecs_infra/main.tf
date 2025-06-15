@@ -23,12 +23,11 @@ resource "aws_security_group" "alb_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
   ingress {
-    from_port   = container_port
-    to_port     = container_port
-    protocol    = "tcp"
-    cidr_blocks = [aws_security_group.alb_sg.id]
+    from_port       = var.container_port
+    to_port         = var.container_port
+    protocol        = "tcp"
+    self            = true
   }
 
   egress {
