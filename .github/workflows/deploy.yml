@@ -63,6 +63,11 @@ jobs:
           echo "cluster_id=$(terraform output -raw cluster_id)" >> $GITHUB_OUTPUT
           echo "target_group_arn=$(terraform output -raw target_group_arn)" >> $GITHUB_OUTPUT
 
+      - name: Debug Output target_group_arn
+        run: |
+          echo "✅ DEBUG: Valor final do target_group_arn:"
+          echo "${{ steps.tf_apply.outputs.target_group_arn }}"
+
   package:
     runs-on: ubuntu-latest
     needs: infra
@@ -133,10 +138,26 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Terraform Init e Apply - ecs_app com nova imagem
+      - name: Terraform Plan - ecs_app (debug)
         working-directory: infra/ecs_app
         run: |
+          echo "🔍 DEBUG: target_group_arn recebido da etapa 'infra':"
+          echo "${{ needs.infra.outputs.target_group_arn }}"
+          echo "🔍 DEBUG: security_group_id:"
+          echo "${{ needs.infra.outputs.security_group_id }}"
+          echo "🔍 DEBUG: image URI:"
+          echo "${{ needs.package.outputs.image_uri }}"
+
           terraform init
+          terraform plan \
+            -var="project_name=${{ needs.infra.outputs.project_name_clean }}" \
+            -var="image=${{ needs.package.outputs.image_uri }}" \
+            -var="security_group_id=${{ needs.infra.outputs.security_group_id }}" \
+            -var="target_group_arn=${{ needs.infra.outputs.target_group_arn }}"
+
+      - name: Terraform Apply - ecs_app com nova imagem
+        working-directory: infra/ecs_app
+        run: |
           terraform apply -auto-approve \
             -var="project_name=${{ needs.infra.outputs.project_name_clean }}" \
             -var="image=${{ needs.package.outputs.image_uri }}" \
