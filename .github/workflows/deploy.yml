@@ -59,14 +59,21 @@ jobs:
         run: |
           terraform init
           terraform apply -auto-approve -var="project_name=${{ steps.extract_name.outputs.project_name_clean }}"
-          echo "security_group_id=$(terraform output -raw security_group_id)" >> $GITHUB_OUTPUT
-          echo "cluster_id=$(terraform output -raw cluster_id)" >> $GITHUB_OUTPUT
-          echo "target_group_arn=$(terraform output -raw target_group_arn)" >> $GITHUB_OUTPUT
+          echo "DEBUG: security_group_id=$(terraform output -raw security_group_id)"
+          echo "DEBUG: cluster_id=$(terraform output -raw cluster_id)"
+          echo "DEBUG: target_group_arn=$(terraform output -raw target_group_arn)"
+          echo "security_group_id=$(terraform output -raw security_group_id | tr -d '\r\n')" >> $GITHUB_OUTPUT
+          echo "cluster_id=$(terraform output -raw cluster_id | tr -d '\r\n')" >> $GITHUB_OUTPUT
+          echo "target_group_arn=$(terraform output -raw target_group_arn | tr -d '\r\n')" >> $GITHUB_OUTPUT
 
       - name: Debug Output target_group_arn
         run: |
-          echo "✅ DEBUG: Valor final do target_group_arn:"
-          echo "${{ steps.tf_apply.outputs.target_group_arn }}"
+          echo "DEBUG: security_group_id=$(terraform output -raw security_group_id)"
+          echo "DEBUG: cluster_id=$(terraform output -raw cluster_id)"
+          echo "DEBUG: target_group_arn=$(terraform output -raw target_group_arn)"
+          echo "security_group_id=$(terraform output -raw security_group_id | tr -d '\r\n')" >> $GITHUB_OUTPUT
+          echo "cluster_id=$(terraform output -raw cluster_id | tr -d '\r\n')" >> $GITHUB_OUTPUT
+          echo "target_group_arn=$(terraform output -raw target_group_arn | tr -d '\r\n')" >> $GITHUB_OUTPUT
 
   package:
     runs-on: ubuntu-latest
