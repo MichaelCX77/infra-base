@@ -1,3 +1,8 @@
+variable "aws_region" {
+  description = "Região da AWS onde os recursos serão criados"
+  default     = "sa-east-1"
+}
+
 # Nome do projeto, usado para nomear recursos ECS, ALB, etc.
 variable "project_name" {
   type = string
@@ -36,16 +41,19 @@ variable "subnet_ids" {
 # ID do grupo de segurança para o serviço ECS
 variable "security_group_id" {
   type = string
+  default = ""
 }
 
 # ID do cluster ECS onde o serviço será criado
 variable "cluster_id" {
   type = string
+  default = ""
 }
 
 # ARN do target group do Application Load Balancer para associar ao serviço ECS
 variable "target_group_arn" {
   type = string
+  default = ""
 }
 
 # Dependência explícita para o listener do load balancer (pode ser null)
@@ -63,4 +71,22 @@ variable "image" {
 variable "vpc_id" {
   description = "ID da VPC"
   type        = string
+}
+
+variable "security_group_id" {
+  description = "Security group para o ECS service"
+  type        = string
+  default     = null
+}
+
+variable "cluster_id" {
+  description = "ID do cluster ECS"
+  type        = string
+  default     = null
+}
+
+variable "target_group_arn" {
+  description = "ARN do target group do ALB"
+  type        = string
+  default     = null
 }

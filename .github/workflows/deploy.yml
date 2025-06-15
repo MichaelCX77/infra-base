@@ -21,11 +21,13 @@ on:
         required: true
 
 jobs:
-  # 1. Criar Infra
   infra:
     runs-on: ubuntu-latest
     outputs:
       project_name_clean: ${{ steps.extract_name.outputs.project_name_clean }}
+      security_group_id: ${{ steps.tf_apply.outputs.security_group_id }}
+      cluster_id: ${{ steps.tf_apply.outputs.cluster_id }}
+      target_group_arn: ${{ steps.tf_apply.outputs.target_group_arn }}
     steps:
       - name: Checkout código Terraform
         uses: actions/checkout@v3
@@ -52,19 +54,21 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Terraform Init e Apply - ecs_infra
+        id: tf_apply
         working-directory: infra/ecs_infra
         run: |
           terraform init
           terraform apply -auto-approve -var="project_name=${{ steps.extract_name.outputs.project_name_clean }}"
+          echo "security_group_id=$(terraform output -raw security_group_id)" >> $GITHUB_OUTPUT
+          echo "cluster_id=$(terraform output -raw cluster_id)" >> $GITHUB_OUTPUT
+          echo "target_group_arn=$(terraform output -raw target_group_arn)" >> $GITHUB_OUTPUT
 
-  # 2. Build e Push da imagem para ECR (depende do infra)
   package:
     runs-on: ubuntu-latest
     needs: infra
     outputs:
       image_uri: ${{ steps.set-image.outputs.image_uri }}
       ecr_uri: ${{ steps.set-image.outputs.ecr_uri }}
-
     steps:
       - name: Checkout código
         uses: actions/checkout@v3
@@ -106,10 +110,9 @@ jobs:
           docker tag "${{ steps.set-image.outputs.ecr_uri }}:$IMAGE_TAG" "${{ steps.set-image.outputs.ecr_uri }}:latest"
           docker push "${{ steps.set-image.outputs.ecr_uri }}:latest"
 
-  # 3. Atualizar ECS com nova imagem, executando módulo ecs_task (depende do package)
   deploy:
     runs-on: ubuntu-latest
-    needs: package
+    needs: [infra, package]
     steps:
       - name: Checkout código Terraform
         uses: actions/checkout@v3
@@ -142,7 +145,8 @@ jobs:
             -var="desired_count=${{ vars.desired_count }}" \
             -var="capacity_provider=${{ vars.capacity_provider }}" \
             -var="subnet_ids=${{ tojson(vars.subnet_ids) }}" \
-            -var="security_group_id=${{ vars.security_group_id }}" \
-            -var="cluster_id=${{ vars.cluster_id }}" \
-            -var="target_group_arn=${{ vars.target_group_arn }}" \
-            -var="lb_listener_depends_on=${{ vars.lb_listener_depends_on }}"
+            -var="vpc_id=${{ vars.vpc_id }}" \
+            -var="container_port=${{ vars.container_port }}" \
+            -var="security_group_id=${{ needs.infra.outputs.security_group_id }}" \
+            -var="cluster_id=${{ needs.infra.outputs.cluster_id }}" \
+            -var="target_group_arn=${{ needs.infra.outputs.target_group_arn }}"

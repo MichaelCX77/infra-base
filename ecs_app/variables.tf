@@ -52,6 +52,7 @@ variable "cluster_id" {
 
 # ARN do target group do Application Load Balancer para associar ao serviço ECS
 variable "target_group_arn" {
+  description = "ARN do target group do ALB"
   type = string
   default = ""
 }
@@ -71,4 +72,16 @@ variable "image" {
 variable "vpc_id" {
   description = "ID da VPC"
   type        = string
+}
+
+variable "security_group_id" {
+  description = "Security group para o ECS service"
+  type        = string
+  default     = null
+}
+
+variable "cluster_id" {
+  description = "ID do cluster ECS"
+  type        = string
+  default     = null
 }
