@@ -7,7 +7,6 @@ module "ecs_app" {
   project_name       = var.project_name
   cpu                = var.cpu
   memory             = var.memory
-  vpc_id             = var.vpc_id
   container_port     = var.container_port
   desired_count      = var.desired_count
   capacity_provider  = var.capacity_provider
