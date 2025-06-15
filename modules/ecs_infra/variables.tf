@@ -1,3 +1,7 @@
+variable "aws_region" {
+  description = "Região da AWS onde os recursos serão criados"
+}
+
 variable "project_name" {
   description = "Nome base do projeto"
 }

@@ -4,6 +4,7 @@ provider "aws" {
 
 module "ecs_app" {
   source             = "../modules/ecs_app"
+  aws_region         = var.aws_region
   project_name       = var.project_name
   cpu                = var.cpu
   memory             = var.memory
