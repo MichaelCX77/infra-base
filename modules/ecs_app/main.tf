@@ -5,10 +5,10 @@ resource "aws_ecs_task_definition" "this" {
   memory                   = var.memory
   network_mode             = "awsvpc"
   execution_role_arn       = var.execution_role_arn
-  
+
   container_definitions = jsonencode([{
     name  = var.project_name
-    image = "${var.image}:latest"
+    image = "${var.image}"
     portMappings = [{
       containerPort = var.container_port
       protocol      = "tcp"
