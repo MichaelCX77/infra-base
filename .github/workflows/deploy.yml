@@ -176,6 +176,7 @@ jobs:
             -var="project_name=${{ needs.infra.outputs.project_name_clean }}" \
             -var="image=${{ env.image_uri }}" \
             -var="security_group_id=${{ env.security_group_id }}" \
+            -var="cluster_id=${{ env.cluster_id }}" \
             -var="target_group_arn=${{ env.target_group_arn }}"
 
       - name: Terraform Apply - ecs_app com nova imagem
@@ -185,4 +186,5 @@ jobs:
             -var="project_name=${{ needs.infra.outputs.project_name_clean }}" \
             -var="image=${{ env.image_uri }}" \
             -var="security_group_id=${{ env.security_group_id }}" \
+            -var="cluster_id=${{ env.cluster_id }}" \
             -var="target_group_arn=${{ env.target_group_arn }}"
