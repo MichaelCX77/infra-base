@@ -57,31 +57,7 @@ variable "target_group_arn" {
   default = ""
 }
 
-# Dependência explícita para o listener do load balancer (pode ser null)
-variable "lb_listener_depends_on" {
-  type    = any
-  default = null
-}
-
-# URI da imagem docker que será usada na task ECS (sem tag, adicionamos ":latest" no main.tf)
-variable "image" {
-  type    = string
-  default = ""
-}
-
 variable "vpc_id" {
   description = "ID da VPC"
   type        = string
-}
-
-variable "security_group_id" {
-  description = "Security group para o ECS service"
-  type        = string
-  default     = null
-}
-
-variable "cluster_id" {
-  description = "ID do cluster ECS"
-  type        = string
-  default     = null
 }
