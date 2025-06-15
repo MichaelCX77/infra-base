@@ -139,7 +139,6 @@ jobs:
           terraform init
           terraform apply -auto-approve \
             -var="project_name=${{ needs.infra.outputs.project_name_clean }}" \
-            -var="image=${{ needs.package.outputs.image_uri }}" \
             -var="cpu=${{ vars.cpu }}" \
             -var="memory=${{ vars.memory }}" \
             -var="desired_count=${{ vars.desired_count }}" \
