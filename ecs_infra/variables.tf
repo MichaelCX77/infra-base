@@ -1,6 +1,5 @@
 variable "aws_region" {
   description = "Região da AWS onde os recursos serão criados"
-  default     = "sa-east-1"
 }
 
 variable "project_name" {
