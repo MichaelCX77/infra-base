@@ -12,8 +12,7 @@ module "ecs_app" {
   desired_count      = var.desired_count
   capacity_provider  = var.capacity_provider
   subnet_ids         = var.subnet_ids
-  security_group_id  = module.ecs_infra.alb_security_group_id
-  cluster_id         = module.ecs_infra.cluster_id
-  target_group_arn   = module.ecs_infra.alb_target_group_arn
-  lb_listener_depends_on = [module.ecs_infra.alb_target_group_arn]
+  security_group_id  = var.security_group_id
+  cluster_id         = var.cluster_id
+  target_group_arn   = var.target_group_arn
 }
