@@ -1,0 +1,61 @@
+name: Validate Terraform
+
+# Este workflow valida arquivos Terraform de infraestrutura e aplicação
+# Aciona apenas em push para branches que NÃO sejam main ou develop
+# e somente quando arquivos .tf dentro de examples/ecs_api forem modificados
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - develop
+    paths:
+      - 'examples/ecs_api/**.tf'
+
+jobs:
+
+  # JOB 1: Validação do módulo de infraestrutura (ecs_infra.tf)
+  validate-infra:
+    name: Validar ecs_infra.tf
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/infra
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Instalar Terraform (versão 1.6.6)
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+
+      - name: Inicializar Terraform (sem backend)
+        run: terraform init -backend=false -input=false
+
+      - name: Validar sintaxe Terraform (ecs_infra)
+        run: terraform validate -no-color -check-variables=false
+
+  # JOB 2: Validação do módulo de aplicação (ecs_app.tf)
+  validate-app:
+    name: Validar ecs_app.tf
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/app
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Instalar Terraform (versão 1.6.6)
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+
+      - name: Inicializar Terraform (sem backend)
+        run: terraform init -backend=false -input=false
+
+      - name: Validar sintaxe Terraform (ecs_app)
+        run: terraform validate -no-color -check-variables=false
