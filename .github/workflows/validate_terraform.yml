@@ -33,7 +33,7 @@ jobs:
         run: terraform init -backend=false -input=false
 
       - name: Validar sintaxe Terraform (ecs_infra)
-        run: terraform validate -no-color -check-variables=false
+        run: terraform validate -no-color
 
   # JOB 2: Validação do módulo de aplicação (ecs_app.tf)
   validate-app:
@@ -56,4 +56,4 @@ jobs:
         run: terraform init -backend=false -input=false
 
       - name: Validar sintaxe Terraform (ecs_app)
-        run: terraform validate -no-color -check-variables=false
+        run: terraform validate -no-color
