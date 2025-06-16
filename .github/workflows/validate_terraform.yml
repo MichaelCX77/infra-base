@@ -9,8 +9,6 @@ on:
     branches-ignore:
       - main
       - develop
-    paths:
-      - 'examples/ecs_api/**.tf'
 
 jobs:
 
