@@ -1,63 +1,68 @@
+# Configurações gerais da AWS e do projeto
 variable "aws_region" {
   description = "Região da AWS onde os recursos serão criados"
+  type        = string
 }
 
-# Nome do projeto, usado para nomear recursos ECS, ALB, etc.
 variable "project_name" {
-  type = string
+  description = "Nome do projeto, usado para nomear recursos ECS, ALB, etc."
+  type        = string
 }
 
-# CPU reservada para a task ECS (ex: "256", "512", "1024")
+# Configurações de recursos ECS (CPU, memória, contagem, capacidade)
 variable "cpu" {
-  type = string
+  description = "CPU reservada para a task ECS (ex: '256', '512', '1024')"
+  type        = string
 }
 
-# Memória reservada para a task ECS (ex: "512", "1024", "2048")
 variable "memory" {
-  type = string
+  description = "Memória reservada para a task ECS (ex: '512', '1024', '2048')"
+  type        = string
 }
 
-# Porta no container onde a aplicação está escutando
 variable "container_port" {
-  type = number
+  description = "Porta no container onde a aplicação está escutando"
+  type        = number
 }
 
-# Quantidade desejada de instâncias (tasks) do serviço ECS
 variable "desired_count" {
-  type = number
+  description = "Quantidade desejada de instâncias (tasks) do serviço ECS"
+  type        = number
 }
 
-# Provedor de capacidade para o ECS (ex: "FARGATE", "FARGATE_SPOT")
 variable "capacity_provider" {
-  type = string
+  description = "Provedor de capacidade para o ECS (ex: 'FARGATE', 'FARGATE_SPOT')"
+  type        = string
 }
 
-# Lista de IDs das subnets onde o serviço ECS será executado
+# Configurações de rede e segurança
 variable "subnet_ids" {
-  type = list(string)
+  description = "Lista de IDs das subnets onde o serviço ECS será executado"
+  type        = list(string)
 }
 
-# ID do grupo de segurança para o serviço ECS
 variable "security_group_id" {
-  type = string
+  description = "ID do grupo de segurança para o serviço ECS"
+  type        = string
 }
 
-# ID do cluster ECS onde o serviço será criado
 variable "cluster_id" {
-  type = string
+  description = "ID do cluster ECS onde o serviço será criado"
+  type        = string
 }
 
-# ARN do target group do Application Load Balancer para associar ao serviço ECS
 variable "target_group_arn" {
-  type = string
+  description = "ARN do target group do Application Load Balancer para associar ao serviço ECS"
+  type        = string
 }
 
-# URI da imagem docker que será usada na task ECS (sem tag, adicionamos ":latest" no main.tf)
+# Imagem Docker e permissões
 variable "image" {
-  type    = string
+  description = "URI da imagem docker que será usada na task ECS (sem tag, adicionamos ':latest' no main.tf)"
+  type        = string
 }
 
-# Role ARN
 variable "execution_role_arn" {
-  type    = string
+  description = "ARN da role de execução para a task ECS"
+  type        = string
 }

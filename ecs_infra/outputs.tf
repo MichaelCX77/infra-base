@@ -1,3 +1,4 @@
+# Outputs relacionados à infraestrutura de rede e cluster ECS
 output "security_group_id" {
   value = module.ecs_infra.security_group_id
 }
