@@ -1,59 +1,75 @@
 name: Validate Terraform
 
-# Este workflow valida arquivos Terraform de infraestrutura e aplicação
+# ─────────────────────────────────────────────────────────────
+# 🔁 EVENTO QUE DISPARA O WORKFLOW
 # Aciona apenas em push para branches que NÃO sejam main ou develop
-# e somente quando arquivos .tf dentro de examples/ecs_api forem modificados
-
+# Útil para validar mudanças antes de mesclar em branches principais
+# ─────────────────────────────────────────────────────────────
 on:
   push:
     branches-ignore:
       - main
       - develop
 
+# ─────────────────────────────────────────────────────────────
+# ✅ JOB 1: Validação do módulo de infraestrutura (ecs_infra.tf)
+# ─────────────────────────────────────────────────────────────
 jobs:
-
-  # JOB 1: Validação do módulo de infraestrutura (ecs_infra.tf)
   validate-infra:
     name: Validar ecs_infra.tf
     runs-on: ubuntu-latest
+
+    # Define o diretório de trabalho para o módulo de infraestrutura
     defaults:
       run:
         working-directory: examples/infra
 
     steps:
+      # 📥 Etapa 1: Clonar o repositório
       - name: Checkout do código
         uses: actions/checkout@v3
 
+      # 🔧 Etapa 2: Instalar Terraform (v1.6.6)
       - name: Instalar Terraform (versão 1.6.6)
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.6.6
 
+      # ⚙️ Etapa 3: Inicializar Terraform (sem backend remoto)
       - name: Inicializar Terraform (sem backend)
         run: terraform init -backend=false -input=false
 
+      # 🔍 Etapa 4: Validar sintaxe dos arquivos Terraform
       - name: Validar sintaxe Terraform (ecs_infra)
         run: terraform validate -no-color
 
-  # JOB 2: Validação do módulo de aplicação (ecs_app.tf)
+# ─────────────────────────────────────────────────────────────
+# ✅ JOB 2: Validação do módulo de aplicação (ecs_app.tf)
+# ─────────────────────────────────────────────────────────────
   validate-app:
     name: Validar ecs_app.tf
     runs-on: ubuntu-latest
+
+    # Define o diretório de trabalho para o módulo de aplicação
     defaults:
       run:
         working-directory: examples/app
 
     steps:
+      # 📥 Etapa 1: Clonar o repositório
       - name: Checkout do código
         uses: actions/checkout@v3
 
+      # 🔧 Etapa 2: Instalar Terraform (v1.6.6)
       - name: Instalar Terraform (versão 1.6.6)
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.6.6
 
+      # ⚙️ Etapa 3: Inicializar Terraform (sem backend remoto)
       - name: Inicializar Terraform (sem backend)
         run: terraform init -backend=false -input=false
 
+      # 🔍 Etapa 4: Validar sintaxe dos arquivos Terraform
       - name: Validar sintaxe Terraform (ecs_app)
         run: terraform validate -no-color
