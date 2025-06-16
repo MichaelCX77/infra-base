@@ -1,3 +1,4 @@
+# Região e Identificação
 variable "aws_region" {
   description = "Região da AWS onde os recursos serão criados"
 }
@@ -6,10 +7,7 @@ variable "project_name" {
   description = "Nome base do projeto"
 }
 
-variable "container_port" {
-  description = "Porta exposta pelo container"
-}
-
+# Configurações de Rede
 variable "vpc_id" {
   description = "ID da VPC"
   type        = string
@@ -20,6 +18,12 @@ variable "subnet_ids" {
   type        = list(string)
 }
 
+# Configurações do Container
+variable "container_port" {
+  description = "Porta exposta pelo container"
+}
+
+# Configurações de Health Check do Load Balancer
 variable "health_check_path" {
   description = "Caminho HTTP para o health check"
   type        = string
@@ -45,6 +49,7 @@ variable "unhealthy_threshold" {
   type        = number
 }
 
+# Configurações de Autoscaling
 variable "min_capacity" {
   description = "Quantidade mínima de tasks no ECS service"
   type        = number
@@ -63,6 +68,7 @@ variable "cpu_target_value" {
   default     = 75.0
 }
 
+# Configurações de Schedule para Escalonamento (Down)
 variable "schedule_down_cron" {
   description = "Cron expression para agendar a escala para baixo (desligar)"
   type        = string
@@ -81,6 +87,7 @@ variable "schedule_down_max_capacity" {
   default     = 0
 }
 
+# Configurações de Schedule para Escalonamento (Up)
 variable "schedule_up_cron" {
   description = "Cron expression para agendar a escala para cima (ligar)"
   type        = string
